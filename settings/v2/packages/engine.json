@@ -59,7 +59,7 @@
         "_value": false
       },
       "profiler": {
-        "_value": true
+        "_value": false
       },
       "particle-2d": {
         "_value": false
@@ -98,7 +98,6 @@
       "gfx-webgl",
       "gfx-webgl2",
       "marionette",
-      "profiler",
       "tween",
       "ui"
     ],
