@@ -1,17 +1,18 @@
 
-import { _decorator, Component, Layers, Node, resources, Sprite, SpriteFrame, UITransform } from 'cc';
+import { _decorator, Component, Layers, Node, random, resources, Sprite, SpriteFrame, UITransform } from 'cc';
 const { ccclass, property } = _decorator;
 import { TileManager } from './TileManager';
-import { createUINode } from '../../Utils';
-import { DataManagerInstance } from '../../Runtime/DataManager';
+import { createUINode, randomByRange } from '../../Utils';
+import DataManager from '../../Runtime/DataManager';
+import ResourceManager from '../../Runtime/ResourceManager';
 
 
 @ccclass('TileMapManager')
 export class TileMapManager extends Component {
   async init(){ //真正的生成瓦片
       //const {mapInfo} = Levels[`level${1}`]
-      const spriteFrames = await this.loadRes()
-      const {mapInfo} = DataManagerInstance
+      const spriteFrames = await ResourceManager.Instance.loadDir('texture/tile/tile')
+      const {mapInfo} = DataManager.Instance
 
 
       for (let i = 0;i < mapInfo.length;i++) {
@@ -24,7 +25,12 @@ export class TileMapManager extends Component {
 
 
             // const sprite = node.addComponent(Sprite)
-            const imgSrc = `tile (${item.src})`
+            //获取路径时进行一定量的随机
+            let number = item.src
+            if((number === 1 || number === 5 || number === 9) && i % 2 === 0 && j % 2 === 0){  //只有偶数的瓦片才进行随机
+              number += randomByRange(0,4)
+            }
+            const imgSrc = `tile (${number})`
             const node = createUINode()
             const spriteFrame = spriteFrames.find(v=>v.name === imgSrc) || spriteFrames[0]
 
@@ -46,20 +52,20 @@ export class TileMapManager extends Component {
       }
   }
 
-  loadRes(){//回调函数不太好写，封装成Promise的形式
-    return new Promise<SpriteFrame[]>((resolve,reject) =>{
-      resources.loadDir("texture/tile/tile",SpriteFrame,function(err,assets){
-        if(err){//如果有报错
-          reject(err)
-          return
-        }
+  // loadRes(){//回调函数不太好写，封装成Promise的形式
+  //   return new Promise<SpriteFrame[]>((resolve,reject) =>{
+  //     resources.loadDir("texture/tile/tile",SpriteFrame,function(err,assets){
+  //       if(err){//如果有报错
+  //         reject(err)
+  //         return
+  //       }
 
-        resolve(assets)//把资源resolve出去
+  //       resolve(assets)//把资源resolve出去
 
 
-      })
-    })
-  }
+  //     })
+  //   })
+  // }
 
 
 
