@@ -7,6 +7,7 @@ import DataManager from '../../Runtime/DataManager';
 import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager';
 import EventManager from '../../Runtime/EventManager';
 import { EVENT_ENUM } from '../../Enums';
+import { PlayerManager } from '../Player/PlayerManager';
 const { ccclass, property } = _decorator;
 
 
@@ -43,6 +44,7 @@ export class BattleManager extends Component {
 
 
             this.generateTileMap()
+            this.generatePlayer()
         }
 
 
@@ -73,6 +75,14 @@ export class BattleManager extends Component {
         tileMapManager.init()
 
         this.adaptPos()
+    }
+
+    generatePlayer(){
+        const player = createUINode()
+        player.setParent(this.stage)
+        const playerManager = player.addComponent(PlayerManager)
+        playerManager.init()
+
     }
 
     adaptPos(){
