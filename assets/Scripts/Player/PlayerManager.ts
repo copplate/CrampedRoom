@@ -1,6 +1,6 @@
 import { _decorator, Component, Node, Sprite, UITransform,Animation, AnimationClip, animation, SpriteFrame } from 'cc';
 import EventManager from '../../Runtime/EventManager';
-import { EVENT_ENUM } from '../../Enums';
+import { CONTROLLER_ENUM, EVENT_ENUM } from '../../Enums';
 import { TILE_HEIGHT, TILE_WIDTH } from '../Tile/TileManager';
 import ResourceManager from '../../Runtime/ResourceManager';
 const { ccclass, property } = _decorator;
@@ -10,7 +10,54 @@ const ANIMATION_SPEED = 1/8
 @ccclass('PlayerManager')
 export class PlayerManager extends Component {
 
+    x:number = 0
+    y:number = 0
+    targetX:number = 0
+    targetY:number = 0
+    private readonly speed = 1 / 10
+
     async init(){
+        await this.render()
+        EventManager.Instance.on(EVENT_ENUM.PLAYER_CONTROL,this.move,this)//把move方法绑定到事件中心
+    }
+
+    update(){ //生命周期函数
+        this.updateXY()
+        this.node.setPosition(this.x * TILE_WIDTH - TILE_WIDTH * 1.5, -this.y * TILE_HEIGHT + TILE_HEIGHT * 1.5) //把虚拟坐标转换成屏幕渲染的实际坐标
+    }
+
+    updateXY(){
+        if(this.targetX < this.x){
+            this.x -= this.speed
+        }else if(this.targetX > this.x){
+            this.x += this.speed
+        }
+
+        if(this.targetY < this.y){
+            this.y -= this.speed
+        }else if(this.targetY > this.y){
+            this.y += this.speed
+        }
+
+        if(Math.abs(this.targetX - this.x) <= 0.1 && Math.abs(this.targetY - this.y) <= 0.1){
+            this.x = this.targetX
+            this.y = this.targetY
+        }
+    }
+
+    move(inputDirection:CONTROLLER_ENUM){
+        if(inputDirection === CONTROLLER_ENUM.TOP){
+            this.targetY -= 1
+        }else if(inputDirection === CONTROLLER_ENUM.BOTTOM){
+            this.targetY += 1
+        }else if(inputDirection === CONTROLLER_ENUM.LEFT){
+            this.targetX -= 1
+        }else if(inputDirection === CONTROLLER_ENUM.RIGHT){
+            this.targetX += 1
+        }
+    }
+
+    async render(){
         //添加一个Sprite组件
         const sprite = this.addComponent(Sprite)
         sprite.sizeMode = Sprite.SizeMode.CUSTOM
@@ -47,6 +94,5 @@ export class PlayerManager extends Component {
         animationClip.wrapMode = AnimationClip.WrapMode.Loop
         animationComponent.defaultClip = animationClip
         animationComponent.play()
-
     }
 }
